@@ -1,0 +1,32 @@
+{
+  "name": "boids",
+  "version": "1.0.0",
+  "description": "Flocking simulator",
+  "main": "Boid.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markuskurz/boids.git"
+  },
+  "author": "Markus Kurz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/markuskurz/boids/issues"
+  },
+  "homepage": "https://github.com/markuskurz/boids",
+  "devDependencies": {
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "grunt": "^1.0.3",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-eslint": "^21.0.0"
+  },
+  "engines": {
+    "node": "^10.10.0",
+    "npm": "^6.4.1"
+  }
+}
