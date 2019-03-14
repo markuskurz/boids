@@ -5,7 +5,7 @@
   "main": "Boid.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "browser-sync start --server --files \"src/*\"",
+    "dev": "browser-sync start --server --files \"./src/*\"",
     "build": "npx webpack src/main.js"
   },
   "repository": {
@@ -26,8 +26,10 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-promise": "^4.0.1",
     "grunt": "^1.0.3",
+    "grunt-browser-sync": "^2.2.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^21.0.0",
+    "grunt-shell": "^3.0.1",
     "webpack": "^4.29.1",
     "webpack-cli": "^3.2.1"
   },

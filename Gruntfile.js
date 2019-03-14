@@ -8,12 +8,35 @@ module.exports = (grunt) => {
     },
     watch: {
       files: ['src/**/*.js'],
-      tasks: ['eslint'],
+      tasks: ['build'],
+    },
+    browserSync: {
+      bsFiles: {
+        src: './src/*',
+      },
+      options: {
+        watchTask: true,
+        server: {
+          baseDir: './',
+        },
+      },
+    },
+    shell: {
+      options: {
+        stderr: false,
+      },
+      build: {
+        command: 'npm run build',
+      },
     },
   });
 
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-browser-sync');
 
-  grunt.registerTask('default', ['eslint']);
+  grunt.registerTask('default', ['browserSync', 'watch']);
+  grunt.registerTask('linst', ['eslint']);
+  grunt.registerTask('build', ['shell:build']);
 };
