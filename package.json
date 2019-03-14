@@ -4,7 +4,8 @@
   "description": "Flocking simulator",
   "main": "Boid.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "browser-sync start --server --files \"src/*\""
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/markuskurz/boids",
   "devDependencies": {
+    "browser-sync": "^2.26.3",
     "eslint": "^5.6.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
