@@ -15,10 +15,23 @@ export default class Boid {
     this.draw();
   }
 
+  getAngle() {
+    return Math.atan2(this.velocity.y, this.velocity.x);
+  }
+
   draw() {
+    this.context.translate(this.position.x, this.position.y);
+    const angle = this.getAngle();
+    this.context.rotate(angle);
+    this.drawShape();
+    this.context.rotate(-1 * angle);
+    this.context.translate(-1 * this.position.x, -1 * this.position.y);
+  }
+
+  drawShape() {
     this.context.beginPath();
     this.context.fillStyle = 'blue';
-    this.context.rect(this.position.x, this.position.y, this.size, this.size);
+    this.context.rect(0, 0, this.size * 5, this.size);
     this.context.fill();
     this.context.closePath();
   }

@@ -11,7 +11,7 @@ function createCanvas() {
 function setupSwarm() {
   const canvas = createCanvas();
   document.body.appendChild(canvas);
-  return new Swarm(100, canvas);
+  return new Swarm(10, canvas);
 }
 
 let lastTimestamp = null;
