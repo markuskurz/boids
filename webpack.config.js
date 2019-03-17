@@ -16,7 +16,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'boids.js',
+    filename: 'app.js',
     path: path.resolve(__dirname, 'dist'),
   },
   devtool: 'source-map',

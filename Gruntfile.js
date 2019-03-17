@@ -12,7 +12,22 @@ module.exports = (grunt) => {
     },
     shell: {
       build: {
-        command: 'npm run build',
+        command: 'npx webpack',
+      },
+      clean: {
+        command: 'rm -r ./dist',
+      },
+    },
+    copy: {
+      main: {
+        files: [
+          {
+            expand: true,
+            cwd: 'src',
+            src: ['**/*.html', '**/*.css'],
+            dest: 'dist',
+          },
+        ],
       },
     },
   });
@@ -20,8 +35,10 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask('default', ['watch']);
-  grunt.registerTask('linst', ['eslint']);
-  grunt.registerTask('build', ['shell:build']);
+  grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask('build', ['copy', 'shell:build']);
+  grunt.registerTask('clean', ['shell:clean']);
 };
