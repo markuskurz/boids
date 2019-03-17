@@ -1,10 +1,14 @@
 module.exports = (grunt) => {
   grunt.initConfig({
-    eslint: {
-      target: [
-        './src/**/*.ts',
-        'Gruntfile.js',
-      ],
+    tslint: {
+      options: {
+        configuration: 'tslint.json',
+      },
+      files: {
+        src: [
+          './src/**/*.ts',
+        ],
+      },
     },
     watch: {
       files: ['./src/*'],
@@ -32,13 +36,13 @@ module.exports = (grunt) => {
     },
   });
 
-  grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-tslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask('default', ['watch']);
-  grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('build', ['copy', 'shell:build']);
+  grunt.registerTask('default', ['lint', 'clean', 'build']);
+  grunt.registerTask('lint', ['tslint']);
   grunt.registerTask('clean', ['shell:clean']);
+  grunt.registerTask('build', ['copy', 'shell:build']);
 };
