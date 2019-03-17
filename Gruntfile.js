@@ -3,6 +3,7 @@ module.exports = (grunt) => {
     tslint: {
       options: {
         configuration: 'tslint.json',
+        force: true,
       },
       files: {
         src: [
@@ -12,7 +13,10 @@ module.exports = (grunt) => {
     },
     watch: {
       files: ['./src/*'],
-      tasks: ['shell:build'],
+      tasks: ['lint', 'build'],
+      options: {
+        atBegin: true,
+      }
     },
     shell: {
       build: {

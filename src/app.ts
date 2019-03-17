@@ -19,7 +19,6 @@ let deltaT: number = 0;
 
 const swarm = setupSwarm();
 
-
 function runSimulation(timestamp: number) {
   deltaT = timestamp - lastTimestamp;
   swarm.update(deltaT);
@@ -27,8 +26,8 @@ function runSimulation(timestamp: number) {
   window.requestAnimationFrame(runSimulation);
 }
 
-function gameLoop(swarm: Swarm) {
+function gameLoop() {
   window.requestAnimationFrame(runSimulation);
 }
 
-gameLoop(swarm);
+gameLoop();
