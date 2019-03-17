@@ -1,5 +1,12 @@
 export default class Boid {
-  constructor(canvas) {
+  canvas: HTMLCanvasElement;
+  context: any;
+  position: { x: number; y: number; };
+  maxSpeed: number;
+  velocity: { x: number; y: number; };
+  size: number;
+
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
     this.position = {
@@ -30,13 +37,13 @@ export default class Boid {
 
   drawShape() {
     this.context.beginPath();
-    this.context.fillStyle = 'blue';
+    this.context.fillStyle = 'red';
     this.context.rect(0, 0, this.size * 5, this.size);
     this.context.fill();
     this.context.closePath();
   }
 
-  updatePosition(deltaT) {
+  updatePosition(deltaT: number) {
     this.position.x = this.position.x + (this.velocity.x * deltaT);
     this.position.y = this.position.y + (this.velocity.y * deltaT);
     if (this.position.x > this.canvas.width - this.size || this.position.x < 0) {

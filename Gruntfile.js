@@ -8,7 +8,7 @@ module.exports = (grunt) => {
     },
     watch: {
       files: ['src/**/*.js'],
-      tasks: ['build'],
+      tasks: ['shell:build'],
     },
     browserSync: {
       bsFiles: {
@@ -22,9 +22,9 @@ module.exports = (grunt) => {
       },
     },
     shell: {
-      options: {
-        stderr: false,
-      },
+      // options: {
+      //   stderr: false,
+      // },
       build: {
         command: 'npm run build',
       },

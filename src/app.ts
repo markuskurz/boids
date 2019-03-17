@@ -3,8 +3,8 @@ import Swarm from './Swarm';
 function createCanvas() {
   const canvas = document.createElement('canvas');
   canvas.setAttribute('id', 'mainCanvas');
-  canvas.setAttribute('width', window.innerWidth);
-  canvas.setAttribute('height', window.innerHeight);
+  canvas.setAttribute('width', window.innerWidth.toString());
+  canvas.setAttribute('height', window.innerHeight.toString());
   return canvas;
 }
 
@@ -14,20 +14,20 @@ function setupSwarm() {
   return new Swarm(10, canvas);
 }
 
-let lastTimestamp = null;
-let deltaT = 0;
+let lastTimestamp: number = null;
+let deltaT: number = 0;
 
 const swarm = setupSwarm();
 
 
-function runSimulation(timestamp) {
+function runSimulation(timestamp: number) {
   deltaT = timestamp - lastTimestamp;
   swarm.update(deltaT);
   lastTimestamp = timestamp;
   window.requestAnimationFrame(runSimulation);
 }
 
-function gameLoop(swarm) {
+function gameLoop(swarm: Swarm) {
   window.requestAnimationFrame(runSimulation);
 }
 
