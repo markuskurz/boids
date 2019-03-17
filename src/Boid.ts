@@ -37,7 +37,7 @@ export default class Boid {
 
   drawShape() {
     this.context.beginPath();
-    this.context.fillStyle = 'red';
+    this.context.fillStyle = 'blue';
     this.context.rect(0, 0, this.size * 5, this.size);
     this.context.fill();
     this.context.closePath();
