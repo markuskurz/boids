@@ -19,4 +19,5 @@ module.exports = {
     filename: 'boids.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  devtool: 'source-map',
 };

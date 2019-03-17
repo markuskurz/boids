@@ -6,6 +6,13 @@
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
-    "lib": ["es5", "dom", "es2015.core"]
-  }
+    "lib": ["es5", "dom", "es2015.core"],
+    "sourceMap": true
+  },
+  "include": [
+    "src/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
