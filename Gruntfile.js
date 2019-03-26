@@ -1,42 +1,52 @@
 module.exports = (grunt) => {
   grunt.initConfig({
-    eslint: {
-      target: [
-        'src/**/*.js',
-        'Gruntfile.js',
-      ],
+    tslint: {
+      options: {
+        configuration: 'tslint.json',
+        force: true,
+      },
+      files: {
+        src: [
+          './src/**/*.ts',
+        ],
+      },
     },
     watch: {
-      files: ['src/**/*.js'],
-      tasks: ['build'],
-    },
-    browserSync: {
-      bsFiles: {
-        src: './src/*',
-      },
+      files: ['./src/*'],
+      tasks: ['lint', 'build'],
       options: {
-        watchTask: true,
-        server: {
-          baseDir: './',
-        },
-      },
+        atBegin: true,
+      }
     },
     shell: {
-      options: {
-        stderr: false,
-      },
       build: {
-        command: 'npm run build',
+        command: 'npx webpack',
+      },
+      clean: {
+        command: 'rm -r ./dist',
+      },
+    },
+    copy: {
+      main: {
+        files: [
+          {
+            expand: true,
+            cwd: 'src',
+            src: ['**/*.html', '**/*.css'],
+            dest: 'dist',
+          },
+        ],
       },
     },
   });
 
-  grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-tslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-browser-sync');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask('default', ['browserSync', 'watch']);
-  grunt.registerTask('linst', ['eslint']);
-  grunt.registerTask('build', ['shell:build']);
+  grunt.registerTask('default', ['lint', 'clean', 'build']);
+  grunt.registerTask('lint', ['tslint']);
+  grunt.registerTask('clean', ['shell:clean']);
+  grunt.registerTask('build', ['copy', 'shell:build']);
 };
