@@ -2,8 +2,8 @@ import Boid from './Boid';
 
 export default class Swarm {
   private boids: Boid[];
-  private canvas: any;
-  private context: any;
+  private canvas: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D;
 
   constructor(numberOfBoids: number, canvas: HTMLCanvasElement) {
     this.boids = [];
@@ -14,7 +14,7 @@ export default class Swarm {
     }
   }
 
-  public update(deltaT: number) {
+  public update(deltaT: number): void {
     this.clearCanvas();
     const numberOfBoids = this.boids.length;
     for (let i = 0; i < numberOfBoids; i += 1) {
@@ -23,7 +23,7 @@ export default class Swarm {
     }
   }
 
-  private clearCanvas() {
+  private clearCanvas(): void {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     // this.canvas.width = this.canvas.width;
   }

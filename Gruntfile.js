@@ -1,30 +1,28 @@
-module.exports = (grunt) => {
+module.exports = grunt => {
   grunt.initConfig({
     eslint: {
       options: {
         configuration: '.eslintrc.yml',
-        force: true,
+        force: true
       },
       files: {
-        src: [
-          './src/**/*.ts',
-        ],
-      },
+        src: ['./src/**/*.ts']
+      }
     },
     watch: {
       files: ['./src/*'],
       tasks: ['lint', 'build'],
       options: {
-        atBegin: true,
+        atBegin: true
       }
     },
     shell: {
       build: {
-        command: 'npx webpack',
+        command: 'npx webpack'
       },
       clean: {
-        command: 'rm -r ./dist',
-      },
+        command: 'rm -r ./dist'
+      }
     },
     copy: {
       main: {
@@ -33,11 +31,11 @@ module.exports = (grunt) => {
             expand: true,
             cwd: 'src',
             src: ['**/*.html', '**/*.css'],
-            dest: 'dist',
-          },
-        ],
-      },
-    },
+            dest: 'dist'
+          }
+        ]
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-eslint');

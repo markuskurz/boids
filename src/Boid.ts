@@ -1,9 +1,8 @@
 export default class Boid {
   private canvas: HTMLCanvasElement;
-  private context: any;
-  private mass: number;
-  private position: { x: number; y: number; };
-  private velocity: { x: number; y: number; };
+  private context: CanvasRenderingContext2D;
+  private position: { x: number; y: number };
+  private velocity: { x: number; y: number };
   private orientation: number;
   private neighborhoodRadius: number;
   private size: number;
@@ -15,17 +14,17 @@ export default class Boid {
     this.neighborhoodRadius = 100;
     this.position = {
       x: Math.random() * this.canvas.width,
-      y: Math.random() * this.canvas.height,
+      y: Math.random() * this.canvas.height
     };
     this.velocity = {
       x: Math.random() * 0.5 * Math.sign(Math.random() - 0.5),
-      y: Math.random() * 0.5 * Math.sign(Math.random() - 0.5),
+      y: Math.random() * 0.5 * Math.sign(Math.random() - 0.5)
     };
     this.orientation = this.getOrientation();
     this.draw();
   }
 
-  public draw() {
+  public draw(): void {
     this.context.translate(this.position.x, this.position.y);
     this.context.rotate(this.orientation);
     this.drawShape();
@@ -33,18 +32,18 @@ export default class Boid {
     this.context.translate(-1 * this.position.x, -1 * this.position.y);
   }
 
-  public updatePosition(deltaT: number) {
-    this.position.x = this.position.x + (this.velocity.x * deltaT);
-    this.position.y = this.position.y + (this.velocity.y * deltaT);
+  public updatePosition(deltaT: number): void {
+    this.position.x = this.position.x + this.velocity.x * deltaT;
+    this.position.y = this.position.y + this.velocity.y * deltaT;
     this.wrapPosition();
     this.orientation = this.getOrientation();
   }
 
-  private getOrientation() {
+  private getOrientation(): number {
     return Math.atan2(this.velocity.y, this.velocity.x);
   }
 
-  private drawShape() {
+  private drawShape(): void {
     this.context.beginPath();
     this.context.fillStyle = 'blue';
     this.context.rect(0, 0, this.size * 5, this.size);
@@ -52,7 +51,7 @@ export default class Boid {
     this.context.closePath();
   }
 
-  private wrapPosition() {
+  private wrapPosition(): void {
     if (this.position.x > this.canvas.width) {
       this.position.x = this.position.x - this.canvas.width;
     } else if (this.position.x < 0) {

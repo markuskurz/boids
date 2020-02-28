@@ -1,6 +1,19 @@
 import Swarm from './Swarm';
 
-function createCanvas() {
+interface MyWindow extends Window {
+  requestAnimationFrame(callback: FrameRequestCallback): number;
+  innerWidth: number;
+  innerHeight: number;
+}
+
+interface MyDocument extends Document {
+  createElement(nodeName: string): HTMLCanvasElement;
+}
+
+declare const window: MyWindow;
+declare const document: MyDocument;
+
+function createCanvas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.setAttribute('id', 'mainCanvas');
   canvas.setAttribute('width', window.innerWidth.toString());
@@ -8,25 +21,25 @@ function createCanvas() {
   return canvas;
 }
 
-function setupSwarm() {
+function setupSwarm(): Swarm {
   const canvas = createCanvas();
   document.body.appendChild(canvas);
   return new Swarm(10, canvas);
 }
 
 let lastTimestamp: number = null;
-let deltaT: number = 0;
+let deltaT = 0;
 
 const swarm = setupSwarm();
 
-function runSimulation(timestamp: number) {
+function runSimulation(timestamp: number): void {
   deltaT = timestamp - lastTimestamp;
   swarm.update(deltaT);
   lastTimestamp = timestamp;
   window.requestAnimationFrame(runSimulation);
 }
 
-function gameLoop() {
+function gameLoop(): void {
   window.requestAnimationFrame(runSimulation);
 }
 
