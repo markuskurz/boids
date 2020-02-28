@@ -53,13 +53,19 @@ export default class Boid {
     return this.position;
   }
 
+  public getVelocity(): { x: number; y: number } {
+    return this.velocity;
+  }
+
   public steer(neighbors: Boid[]): void {
     if (neighbors.length < 1) {
       return;
     }
     const separationVelocity = this.separate(neighbors);
-    this.velocity.x += separationVelocity.x / 5000;
-    this.velocity.y += separationVelocity.y / 5000;
+    const alignmentVelocity = this.align(neighbors);
+
+    this.velocity.x += separationVelocity.x / 5000 + alignmentVelocity.x / 10;
+    this.velocity.y += separationVelocity.y / 5000 + alignmentVelocity.y / 10;
     this.velocity = this.normalizeVelocity(this.velocity);
 
     this.velocity.x *= this.speed;
@@ -117,5 +123,21 @@ export default class Boid {
       steeringVelocity.y -= neighbors[i].getPosition().y - this.position.y;
     }
     return steeringVelocity;
+  }
+
+  private align(neighbors: Boid[]): { x: number; y: number } {
+    const alignmentVelocity = {
+      x: 0,
+      y: 0
+    };
+    for (let i = 0; i < neighbors.length; i += 1) {
+      alignmentVelocity.x += neighbors[i].getVelocity().x;
+      alignmentVelocity.y += neighbors[i].getVelocity().y;
+    }
+
+    alignmentVelocity.x /= neighbors.length;
+    alignmentVelocity.y /= neighbors.length;
+
+    return alignmentVelocity;
   }
 }
