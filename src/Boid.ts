@@ -11,7 +11,7 @@ export default class Boid {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
-    this.size = { x: 30, y: 15 };
+    this.size = { x: 20, y: 15 };
     this.speed = 0.2;
     this.neighborhoodRadius = 100;
     this.position = {
@@ -70,11 +70,10 @@ export default class Boid {
     this.context.fillStyle = 'blue';
     // this.context.rect(0, 0, this.size * 5, this.size);
     this.context.beginPath();
-    this.context.moveTo(0, 0);
-    this.context.lineTo(this.size.x, this.size.y / 2);
-    this.context.lineTo(0, this.size.y);
-    this.context.lineTo(this.size.x / 3, this.size.y / 2);
-    this.context.lineTo(0, 0);
+    this.context.moveTo(-this.size.x / 2, -this.size.y / 2);
+    this.context.lineTo(this.size.x, 0);
+    this.context.lineTo(-this.size.x / 2, this.size.y / 2);
+    this.context.lineTo(-this.size.x / 3, 0);
     this.context.closePath();
     this.context.fill();
     this.context.closePath();
