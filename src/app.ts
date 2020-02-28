@@ -24,7 +24,7 @@ function createCanvas(): HTMLCanvasElement {
 function setupSwarm(): Swarm {
   const canvas = createCanvas();
   document.body.appendChild(canvas);
-  return new Swarm(10, canvas);
+  return new Swarm(20, canvas);
 }
 
 let lastTimestamp: number = null;
