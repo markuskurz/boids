@@ -4,8 +4,6 @@ export default class Boid {
   private mass: number;
   private position: { x: number; y: number; };
   private velocity: { x: number; y: number; };
-  private maxForce: number;
-  private maxSpeed: number;
   private orientation: number;
   private neighborhoodRadius: number;
   private size: number;
@@ -19,10 +17,9 @@ export default class Boid {
       x: Math.random() * this.canvas.width,
       y: Math.random() * this.canvas.height,
     };
-    this.maxSpeed = 0.5;
     this.velocity = {
-      x: Math.random() * this.maxSpeed * Math.sign(Math.random() - 0.5),
-      y: Math.random() * this.maxSpeed * Math.sign(Math.random() - 0.5),
+      x: Math.random() * 0.5 * Math.sign(Math.random() - 0.5),
+      y: Math.random() * 0.5 * Math.sign(Math.random() - 0.5),
     };
     this.orientation = this.getOrientation();
     this.draw();
@@ -39,7 +36,7 @@ export default class Boid {
   public updatePosition(deltaT: number) {
     this.position.x = this.position.x + (this.velocity.x * deltaT);
     this.position.y = this.position.y + (this.velocity.y * deltaT);
-    this.avoidBorders(deltaT);
+    this.wrapPosition();
     this.orientation = this.getOrientation();
   }
 
@@ -55,14 +52,16 @@ export default class Boid {
     this.context.closePath();
   }
 
-  private avoidBorders(deltaT: number) {
-    if (this.position.x > this.canvas.width || this.position.x < 0) {
-      this.velocity.x *= -1;
-      this.position.x = this.position.x + (this.velocity.x * deltaT);
+  private wrapPosition() {
+    if (this.position.x > this.canvas.width) {
+      this.position.x = this.position.x - this.canvas.width;
+    } else if (this.position.x < 0) {
+      this.position.x = this.position.x + this.canvas.width;
     }
-    if (this.position.y > this.canvas.height || this.position.y < 0) {
-      this.velocity.y *= -1;
-      this.position.y = this.position.y + (this.velocity.y * deltaT);
+    if (this.position.y > this.canvas.height) {
+      this.position.y = this.position.y - this.canvas.height;
+    } else if (this.position.y < 0) {
+      this.position.y = this.position.y + this.canvas.height;
     }
   }
 }
