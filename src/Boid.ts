@@ -49,6 +49,17 @@ export default class Boid {
     return distance;
   }
 
+  public calculateDistanceVector(point: {
+    x: number;
+    y: number;
+  }): { x: number; y: number } {
+    const distanceVector = {
+      x: point.x - this.position.x,
+      y: point.y - this.position.y
+    };
+    return distanceVector;
+  }
+
   public getPosition(): { x: number; y: number } {
     return this.position;
   }
@@ -61,11 +72,18 @@ export default class Boid {
     if (neighbors.length < 1) {
       return;
     }
-    const separationVelocity = this.separate(neighbors);
-    const alignmentVelocity = this.align(neighbors);
+    const separationVelocity = this.calculateSeparation(neighbors);
+    const alignmentVelocity = this.calculateAlignment(neighbors);
+    const cohesionVelocity = this.calculateCohesion(neighbors);
 
-    this.velocity.x += separationVelocity.x / 5000 + alignmentVelocity.x / 10;
-    this.velocity.y += separationVelocity.y / 5000 + alignmentVelocity.y / 10;
+    this.velocity.x +=
+      separationVelocity.x / 5000 +
+      alignmentVelocity.x / 10 +
+      cohesionVelocity.x / 3000;
+    this.velocity.y +=
+      separationVelocity.y / 5000 +
+      alignmentVelocity.y / 10 +
+      cohesionVelocity.y / 3000;
     this.velocity = this.normalizeVelocity(this.velocity);
 
     this.velocity.x *= this.speed;
@@ -87,7 +105,6 @@ export default class Boid {
     this.context.lineTo(-this.size.x / 3, 0);
     this.context.closePath();
     this.context.fill();
-    this.context.closePath();
   }
 
   private wrapPosition(): void {
@@ -113,7 +130,7 @@ export default class Boid {
     return velocity;
   }
 
-  private separate(neighbors: Boid[]): { x: number; y: number } {
+  private calculateSeparation(neighbors: Boid[]): { x: number; y: number } {
     const steeringVelocity = {
       x: 0,
       y: 0
@@ -125,7 +142,7 @@ export default class Boid {
     return steeringVelocity;
   }
 
-  private align(neighbors: Boid[]): { x: number; y: number } {
+  private calculateAlignment(neighbors: Boid[]): { x: number; y: number } {
     const alignmentVelocity = {
       x: 0,
       y: 0
@@ -139,5 +156,22 @@ export default class Boid {
     alignmentVelocity.y /= neighbors.length;
 
     return alignmentVelocity;
+  }
+
+  private calculateCohesion(neighbors: Boid[]): { x: number; y: number } {
+    const centerOfMass = {
+      x: 0,
+      y: 0
+    };
+    for (let i = 0; i < neighbors.length; i += 1) {
+      centerOfMass.x += neighbors[i].getPosition().x;
+      centerOfMass.y += neighbors[i].getPosition().y;
+    }
+
+    centerOfMass.x /= neighbors.length;
+    centerOfMass.y /= neighbors.length;
+
+    const cohesionVector = this.calculateDistanceVector(centerOfMass);
+    return cohesionVector;
   }
 }
