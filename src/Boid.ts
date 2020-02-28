@@ -1,19 +1,23 @@
 export default class Boid {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private color: string;
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
   private speed: number;
   private orientation: number;
   private neighborhoodRadius: number;
+  private collisionRadius: number;
   private size: { x: number; y: number };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
+    this.color = 'blue';
     this.size = { x: 20, y: 15 };
     this.speed = 0.2;
     this.neighborhoodRadius = 100;
+    this.collisionRadius = 150;
     this.position = {
       x: Math.random() * this.canvas.width,
       y: Math.random() * this.canvas.height
@@ -30,16 +34,25 @@ export default class Boid {
     this.context.translate(this.position.x, this.position.y);
     this.context.rotate(this.orientation);
     this.drawShape();
-    this.drawNeighborhoodRadius();
+    this.drawFieldOfVision();
     this.context.rotate(-1 * this.orientation);
     this.context.translate(-1 * this.position.x, -1 * this.position.y);
   }
 
   public updatePosition(deltaT: number): void {
-    this.position.x = this.position.x + this.velocity.x * deltaT;
-    this.position.y = this.position.y + this.velocity.y * deltaT;
-    this.wrapPosition();
+    this.position = this.move(deltaT);
+    //this.wrapPosition();
     this.orientation = this.getOrientation();
+  }
+
+  private move(deltaT: number): { x: number; y: number } {
+    const newPosition = {
+      x: 0,
+      y: 0
+    };
+    newPosition.x = this.position.x + this.velocity.x * deltaT;
+    newPosition.y = this.position.y + this.velocity.y * deltaT;
+    return newPosition;
   }
 
   public calculateDistance(point: { x: number; y: number }): number {
@@ -70,18 +83,25 @@ export default class Boid {
   }
 
   public steer(neighbors: Boid[]): void {
-    if (neighbors.length < 1) {
-      return;
+    const avoidanceVelocity = this.avoidBorders();
+
+    let separationVelocity = { x: 0, y: 0 };
+    let alignmentVelocity = { x: 0, y: 0 };
+    let cohesionVelocity = { x: 0, y: 0 };
+
+    if (neighbors.length > 1) {
+      separationVelocity = this.calculateSeparation(neighbors);
+      alignmentVelocity = this.calculateAlignment(neighbors);
+      cohesionVelocity = this.calculateCohesion(neighbors);
     }
-    const separationVelocity = this.calculateSeparation(neighbors);
-    const alignmentVelocity = this.calculateAlignment(neighbors);
-    const cohesionVelocity = this.calculateCohesion(neighbors);
 
     this.velocity.x +=
+      avoidanceVelocity.x / 50 +
       separationVelocity.x / 5000 +
       alignmentVelocity.x / 10 +
       cohesionVelocity.x / 3000;
     this.velocity.y +=
+      avoidanceVelocity.y / 50 +
       separationVelocity.y / 5000 +
       alignmentVelocity.y / 10 +
       cohesionVelocity.y / 3000;
@@ -97,7 +117,7 @@ export default class Boid {
 
   private drawShape(): void {
     this.context.beginPath();
-    this.context.fillStyle = 'blue';
+    this.context.fillStyle = this.color;
     // this.context.rect(0, 0, this.size * 5, this.size);
     this.context.beginPath();
     this.context.moveTo(-this.size.x / 2, -this.size.y / 2);
@@ -108,12 +128,15 @@ export default class Boid {
     this.context.fill();
   }
 
-  private drawNeighborhoodRadius(): void {
-    this.context.beginPath();
-    this.context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-    // this.context.rect(0, 0, this.size * 5, this.size);
+  private drawFieldOfVision(): void {
+    this.context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     this.context.beginPath();
     this.context.arc(0, 0, this.neighborhoodRadius, 0, 2 * Math.PI);
+    this.context.stroke();
+
+    this.context.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+    this.context.beginPath();
+    this.context.arc(0, 0, this.collisionRadius, 0, 2 * Math.PI);
     this.context.stroke();
   }
 
@@ -138,6 +161,32 @@ export default class Boid {
     velocity.x /= speed;
     velocity.y /= speed;
     return velocity;
+  }
+
+  private avoidBorders(): { x: number; y: number } {
+    const steeringVelocity = {
+      x: 0,
+      y: 0
+    };
+    if (this.position.x + this.collisionRadius > this.canvas.width) {
+      steeringVelocity.x = -1;
+    } else if (this.position.x - this.collisionRadius < 0) {
+      steeringVelocity.x = 1;
+    }
+
+    if (this.position.y + this.collisionRadius > this.canvas.height) {
+      steeringVelocity.y = -1;
+    } else if (this.position.y - this.collisionRadius < 0) {
+      steeringVelocity.y = 1;
+    }
+
+    if (steeringVelocity.x !== 0 || steeringVelocity.y !== 0) {
+      this.color = 'red';
+    } else {
+      this.color = 'blue';
+    }
+
+    return steeringVelocity;
   }
 
   private calculateSeparation(neighbors: Boid[]): { x: number; y: number } {
