@@ -17,7 +17,7 @@ export default class Boid {
     this.size = { x: 20, y: 15 };
     this.speed = 0.2;
     this.neighborhoodRadius = 100;
-    this.collisionRadius = 150;
+    this.collisionRadius = 200;
     this.position = {
       x: Math.random() * this.canvas.width,
       y: Math.random() * this.canvas.height
@@ -41,7 +41,6 @@ export default class Boid {
 
   public updatePosition(deltaT: number): void {
     this.position = this.move(deltaT);
-    //this.wrapPosition();
     this.orientation = this.getOrientation();
   }
 
@@ -85,27 +84,26 @@ export default class Boid {
   public steer(neighbors: Boid[]): void {
     const avoidanceVelocity = this.avoidBorders();
 
-    let separationVelocity = { x: 0, y: 0 };
-    let alignmentVelocity = { x: 0, y: 0 };
-    let cohesionVelocity = { x: 0, y: 0 };
+    this.velocity.x += avoidanceVelocity.x / 100;
+    this.velocity.y += avoidanceVelocity.y / 100;
+
+    this.velocity = this.normalizeVelocity(this.velocity);
 
     if (neighbors.length > 1) {
-      separationVelocity = this.calculateSeparation(neighbors);
-      alignmentVelocity = this.calculateAlignment(neighbors);
-      cohesionVelocity = this.calculateCohesion(neighbors);
-    }
+      const separationVelocity = this.calculateSeparation(neighbors);
+      const alignmentVelocity = this.calculateAlignment(neighbors);
+      const cohesionVelocity = this.calculateCohesion(neighbors);
 
-    this.velocity.x +=
-      avoidanceVelocity.x / 50 +
-      separationVelocity.x / 5000 +
-      alignmentVelocity.x / 10 +
-      cohesionVelocity.x / 3000;
-    this.velocity.y +=
-      avoidanceVelocity.y / 50 +
-      separationVelocity.y / 5000 +
-      alignmentVelocity.y / 10 +
-      cohesionVelocity.y / 3000;
-    this.velocity = this.normalizeVelocity(this.velocity);
+      this.velocity.x +=
+        separationVelocity.x / 5000 +
+        alignmentVelocity.x / 5 +
+        cohesionVelocity.x / 3000;
+      this.velocity.y +=
+        separationVelocity.y / 5000 +
+        alignmentVelocity.y / 5 +
+        cohesionVelocity.y / 3000;
+      this.velocity = this.normalizeVelocity(this.velocity);
+    }
 
     this.velocity.x *= this.speed;
     this.velocity.y *= this.speed;
@@ -138,19 +136,6 @@ export default class Boid {
     this.context.beginPath();
     this.context.arc(0, 0, this.collisionRadius, 0, 2 * Math.PI);
     this.context.stroke();
-  }
-
-  private wrapPosition(): void {
-    if (this.position.x > this.canvas.width) {
-      this.position.x = this.position.x - this.canvas.width;
-    } else if (this.position.x < 0) {
-      this.position.x = this.position.x + this.canvas.width;
-    }
-    if (this.position.y > this.canvas.height) {
-      this.position.y = this.position.y - this.canvas.height;
-    } else if (this.position.y < 0) {
-      this.position.y = this.position.y + this.canvas.height;
-    }
   }
 
   private normalizeVelocity(velocity: {
