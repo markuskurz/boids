@@ -3,6 +3,7 @@ export default class Boid {
   private context: CanvasRenderingContext2D;
   private position: { x: number; y: number };
   private velocity: { x: number; y: number };
+  private speed: number;
   private orientation: number;
   private neighborhoodRadius: number;
   private size: { x: number; y: number };
@@ -10,15 +11,16 @@ export default class Boid {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
-    this.size = { x: 20, y: 15 };
+    this.size = { x: 30, y: 15 };
+    this.speed = 0.2;
     this.neighborhoodRadius = 100;
     this.position = {
       x: Math.random() * this.canvas.width,
       y: Math.random() * this.canvas.height
     };
     this.velocity = {
-      x: Math.random() * 0.5 * Math.sign(Math.random() - 0.5),
-      y: Math.random() * 0.5 * Math.sign(Math.random() - 0.5)
+      x: Math.random() * this.speed * Math.sign(Math.random() - this.speed),
+      y: Math.random() * this.speed * Math.sign(Math.random() - this.speed)
     };
     this.orientation = this.getOrientation();
     this.draw();
@@ -97,8 +99,8 @@ export default class Boid {
     );
     this.velocity.x /= speed;
     this.velocity.y /= speed;
-    this.velocity.x *= 0.5;
-    this.velocity.y *= 0.5;
+    this.velocity.x *= this.speed;
+    this.velocity.y *= this.speed;
   }
 
   private separate(neighbors: Boid[]): void {
@@ -110,7 +112,7 @@ export default class Boid {
       steeringVelocity.x += neighbors[i].getPosition().x - this.position.x;
       steeringVelocity.y += neighbors[i].getPosition().y - this.position.y;
     }
-    this.velocity.x -= 0.001 * steeringVelocity.x;
-    this.velocity.y -= 0.001 * steeringVelocity.y;
+    this.velocity.x -= (this.speed / 1000) * steeringVelocity.x;
+    this.velocity.y -= (this.speed / 1000) * steeringVelocity.y;
   }
 }
