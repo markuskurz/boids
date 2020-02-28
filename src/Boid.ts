@@ -57,8 +57,13 @@ export default class Boid {
     if (neighbors.length < 1) {
       return;
     }
-    this.separate(neighbors);
-    this.normalizeVelocity();
+    const separationVelocity = this.separate(neighbors);
+    this.velocity.x += separationVelocity.x / 5000;
+    this.velocity.y += separationVelocity.y / 5000;
+    this.velocity = this.normalizeVelocity(this.velocity);
+
+    this.velocity.x *= this.speed;
+    this.velocity.y *= this.speed;
   }
 
   private getOrientation(): number {
@@ -92,26 +97,25 @@ export default class Boid {
     }
   }
 
-  private normalizeVelocity(): void {
-    const speed = Math.sqrt(
-      Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2)
-    );
-    this.velocity.x /= speed;
-    this.velocity.y /= speed;
-    this.velocity.x *= this.speed;
-    this.velocity.y *= this.speed;
+  private normalizeVelocity(velocity: {
+    x: number;
+    y: number;
+  }): { x: number; y: number } {
+    const speed = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
+    velocity.x /= speed;
+    velocity.y /= speed;
+    return velocity;
   }
 
-  private separate(neighbors: Boid[]): void {
+  private separate(neighbors: Boid[]): { x: number; y: number } {
     const steeringVelocity = {
       x: 0,
       y: 0
     };
     for (let i = 0; i < neighbors.length; i += 1) {
-      steeringVelocity.x += neighbors[i].getPosition().x - this.position.x;
-      steeringVelocity.y += neighbors[i].getPosition().y - this.position.y;
+      steeringVelocity.x -= neighbors[i].getPosition().x - this.position.x;
+      steeringVelocity.y -= neighbors[i].getPosition().y - this.position.y;
     }
-    this.velocity.x -= (this.speed / 1000) * steeringVelocity.x;
-    this.velocity.y -= (this.speed / 1000) * steeringVelocity.y;
+    return steeringVelocity;
   }
 }
