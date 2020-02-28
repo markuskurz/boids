@@ -30,6 +30,7 @@ export default class Boid {
     this.context.translate(this.position.x, this.position.y);
     this.context.rotate(this.orientation);
     this.drawShape();
+    this.drawNeighborhoodRadius();
     this.context.rotate(-1 * this.orientation);
     this.context.translate(-1 * this.position.x, -1 * this.position.y);
   }
@@ -105,6 +106,15 @@ export default class Boid {
     this.context.lineTo(-this.size.x / 3, 0);
     this.context.closePath();
     this.context.fill();
+  }
+
+  private drawNeighborhoodRadius(): void {
+    this.context.beginPath();
+    this.context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    // this.context.rect(0, 0, this.size * 5, this.size);
+    this.context.beginPath();
+    this.context.arc(0, 0, this.neighborhoodRadius, 0, 2 * Math.PI);
+    this.context.stroke();
   }
 
   private wrapPosition(): void {
