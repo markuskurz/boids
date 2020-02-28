@@ -5,12 +5,12 @@ export default class Boid {
   private velocity: { x: number; y: number };
   private orientation: number;
   private neighborhoodRadius: number;
-  private size: number;
+  private size: { x: number; y: number };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
-    this.size = 5;
+    this.size = { x: 20, y: 15 };
     this.neighborhoodRadius = 100;
     this.position = {
       x: Math.random() * this.canvas.width,
@@ -66,7 +66,14 @@ export default class Boid {
   private drawShape(): void {
     this.context.beginPath();
     this.context.fillStyle = 'blue';
-    this.context.rect(0, 0, this.size * 5, this.size);
+    // this.context.rect(0, 0, this.size * 5, this.size);
+    this.context.beginPath();
+    this.context.moveTo(0, 0);
+    this.context.lineTo(this.size.x, this.size.y / 2);
+    this.context.lineTo(0, this.size.y);
+    this.context.lineTo(this.size.x / 3, this.size.y / 2);
+    this.context.lineTo(0, 0);
+    this.context.closePath();
     this.context.fill();
     this.context.closePath();
   }
