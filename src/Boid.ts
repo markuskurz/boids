@@ -1,31 +1,33 @@
+import Vector from './Vector';
+
 export default class Boid {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private color: string;
-  private position: { x: number; y: number };
-  private velocity: { x: number; y: number };
+  private position: Vector;
+  private velocity: Vector;
   private speed: number;
   private orientation: number;
   private neighborhoodRadius: number;
   private collisionRadius: number;
-  private size: { x: number; y: number };
+  private size: Vector;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
     this.color = 'blue';
-    this.size = { x: 20, y: 15 };
+    this.size = new Vector([20, 15]);
     this.speed = 0.2;
     this.neighborhoodRadius = 100;
     this.collisionRadius = 200;
-    this.position = {
-      x: Math.random() * this.canvas.width,
-      y: Math.random() * this.canvas.height
-    };
-    this.velocity = {
-      x: Math.random() * this.speed * Math.sign(Math.random() - this.speed),
-      y: Math.random() * this.speed * Math.sign(Math.random() - this.speed)
-    };
+    this.position = new Vector([
+      Math.random() * this.canvas.width,
+      Math.random() * this.canvas.height
+    ]);
+    this.velocity = new Vector([
+      Math.random() * this.speed * Math.sign(Math.random() - this.speed),
+      Math.random() * this.speed * Math.sign(Math.random() - this.speed)
+    ]);
     this.orientation = this.getOrientation();
     this.draw();
   }
@@ -44,75 +46,43 @@ export default class Boid {
     this.orientation = this.getOrientation();
   }
 
-  private move(deltaT: number): { x: number; y: number } {
-    const newPosition = {
-      x: 0,
-      y: 0
-    };
-    newPosition.x = this.position.x + this.velocity.x * deltaT;
-    newPosition.y = this.position.y + this.velocity.y * deltaT;
-    return newPosition;
+  private move(deltaT: number): Vector {
+    const offset = this.velocity.scale(deltaT);
+    return this.position.add(offset);
   }
 
-  public calculateDistance(point: { x: number; y: number }): number {
-    const distance = Math.sqrt(
-      Math.pow(this.position.x - point.x, 2) +
-        Math.pow(this.position.y - point.y, 2)
-    );
-    return distance;
-  }
-
-  public calculateDistanceVector(point: {
-    x: number;
-    y: number;
-  }): { x: number; y: number } {
-    const distanceVector = {
-      x: point.x - this.position.x,
-      y: point.y - this.position.y
-    };
-    return distanceVector;
-  }
-
-  public getPosition(): { x: number; y: number } {
+  public getPosition(): Vector {
     return this.position;
   }
 
-  public getVelocity(): { x: number; y: number } {
+  public getVelocity(): Vector {
     return this.velocity;
   }
 
-  public steer(
-    neighbors: Boid[],
-    mousePosition: { x: number; y: number }
-  ): void {
-    let avoidanceVelocity = this.avoidBorders();
-    this.velocity.x += avoidanceVelocity.x / 5000;
-    this.velocity.y += avoidanceVelocity.y / 5000;
-    this.velocity = this.normalizeVelocity(this.velocity);
+  public steer(neighbors: Boid[], mousePosition: Vector): void {
+    const borderAvoidanceVelocity = this.avoidBorders().scale(0.0001);
 
-    avoidanceVelocity = this.avoidMouse(mousePosition);
-    this.velocity.x += avoidanceVelocity.x / 1000;
-    this.velocity.y += avoidanceVelocity.y / 1000;
-    this.velocity = this.normalizeVelocity(this.velocity);
+    this.velocity = this.velocity.add(borderAvoidanceVelocity);
+    this.velocity = this.velocity.normalize();
+
+    const mouseAvoidanceVelocity = this.avoidMouse(mousePosition).scale(0.005);
+    this.velocity = this.velocity.add(mouseAvoidanceVelocity);
+    this.velocity = this.velocity.normalize();
 
     if (neighbors.length > 1) {
-      const separationVelocity = this.calculateSeparation(neighbors);
-      const alignmentVelocity = this.calculateAlignment(neighbors);
-      const cohesionVelocity = this.calculateCohesion(neighbors);
+      const separationVelocity = this.calculateSeparation(neighbors).scale(
+        0.001
+      );
+      this.velocity = this.velocity.add(separationVelocity);
+      const alignmentVelocity = this.calculateAlignment(neighbors).scale(1);
+      this.velocity = this.velocity.add(alignmentVelocity);
+      const cohesionVelocity = this.calculateCohesion(neighbors).scale(0.1);
+      this.velocity = this.velocity.add(cohesionVelocity);
 
-      this.velocity.x +=
-        separationVelocity.x / 5000 +
-        alignmentVelocity.x / 5 +
-        cohesionVelocity.x / 3000;
-      this.velocity.y +=
-        separationVelocity.y / 5000 +
-        alignmentVelocity.y / 5 +
-        cohesionVelocity.y / 3000;
-      this.velocity = this.normalizeVelocity(this.velocity);
+      this.velocity = this.velocity.normalize();
     }
 
-    this.velocity.x *= this.speed;
-    this.velocity.y *= this.speed;
+    this.velocity = this.velocity.scale(this.speed);
   }
 
   private getOrientation(): number {
@@ -144,107 +114,66 @@ export default class Boid {
     this.context.stroke();
   }
 
-  private normalizeVelocity(velocity: {
-    x: number;
-    y: number;
-  }): { x: number; y: number } {
-    const speed = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
-    velocity.x /= speed;
-    velocity.y /= speed;
-    return velocity;
-  }
-
-  private avoidBorders(): { x: number; y: number } {
-    const steeringVelocity = {
-      x: 0,
-      y: 0
-    };
+  private avoidBorders(): Vector {
+    let steeringVelocityX = 0;
+    let steeringVelocityY = 0;
     if (this.position.x + this.collisionRadius > this.canvas.width) {
       const distance = this.canvas.width - this.position.x;
-      steeringVelocity.x = (this.collisionRadius - distance) * -1;
+      steeringVelocityX = (this.collisionRadius - distance) * -1;
     } else if (this.position.x - this.collisionRadius < 0) {
       const distance = this.position.x;
-      steeringVelocity.x = this.collisionRadius - distance;
+      steeringVelocityX = this.collisionRadius - distance;
     }
 
     if (this.position.y + this.collisionRadius > this.canvas.height) {
       const distance = this.canvas.height - this.position.y;
-      steeringVelocity.y = (this.collisionRadius - distance) * -1;
+      steeringVelocityY = (this.collisionRadius - distance) * -1;
     } else if (this.position.y - this.collisionRadius < 0) {
       const distance = this.position.y;
-      steeringVelocity.y = this.collisionRadius - distance;
+      steeringVelocityY = this.collisionRadius - distance;
     }
 
-    return steeringVelocity;
+    return new Vector([steeringVelocityX, steeringVelocityY]);
   }
 
-  private avoidMouse(mousePosition: {
-    x: number;
-    y: number;
-  }): { x: number; y: number } {
+  private avoidMouse(mousePosition: Vector): Vector {
     if (!mousePosition) {
-      return {
-        x: 0,
-        y: 0
-      };
+      return new Vector([0, 0]);
     }
-    const distanceToMouse = this.calculateDistance(mousePosition);
-    if (distanceToMouse < this.collisionRadius) {
-      const distanceVector = this.calculateDistanceVector(mousePosition);
-      return {
-        x: -distanceVector.x,
-        y: -distanceVector.y
-      };
+    const distanceVector = this.position.subtract(mousePosition);
+    const distanceToMouse = distanceVector.length();
+    if (distanceToMouse < this.neighborhoodRadius) {
+      return distanceVector;
     }
-
-    return {
-      x: 0,
-      y: 0
-    };
+    return new Vector([0, 0]);
   }
 
-  private calculateSeparation(neighbors: Boid[]): { x: number; y: number } {
-    const steeringVelocity = {
-      x: 0,
-      y: 0
-    };
+  private calculateSeparation(neighbors: Boid[]): Vector {
+    let steeringVelocity = new Vector([0, 0]);
     for (let i = 0; i < neighbors.length; i += 1) {
-      steeringVelocity.x -= neighbors[i].getPosition().x - this.position.x;
-      steeringVelocity.y -= neighbors[i].getPosition().y - this.position.y;
+      const direction = this.position.subtract(neighbors[i].getPosition());
+      steeringVelocity = steeringVelocity.add(direction);
     }
+    steeringVelocity = steeringVelocity.scale(1 / neighbors.length);
     return steeringVelocity;
   }
 
-  private calculateAlignment(neighbors: Boid[]): { x: number; y: number } {
-    const alignmentVelocity = {
-      x: 0,
-      y: 0
-    };
+  private calculateAlignment(neighbors: Boid[]): Vector {
+    let alignmentVelocity = new Vector([0, 0]);
     for (let i = 0; i < neighbors.length; i += 1) {
-      alignmentVelocity.x += neighbors[i].getVelocity().x;
-      alignmentVelocity.y += neighbors[i].getVelocity().y;
+      alignmentVelocity = alignmentVelocity.add(neighbors[i].getVelocity());
     }
-
-    alignmentVelocity.x /= neighbors.length;
-    alignmentVelocity.y /= neighbors.length;
-
+    alignmentVelocity = alignmentVelocity.scale(1 / neighbors.length);
     return alignmentVelocity;
   }
 
-  private calculateCohesion(neighbors: Boid[]): { x: number; y: number } {
-    const centerOfMass = {
-      x: 0,
-      y: 0
-    };
+  private calculateCohesion(neighbors: Boid[]): Vector {
+    let centerOfMass = new Vector([0, 0]);
     for (let i = 0; i < neighbors.length; i += 1) {
-      centerOfMass.x += neighbors[i].getPosition().x;
-      centerOfMass.y += neighbors[i].getPosition().y;
+      centerOfMass = centerOfMass.add(neighbors[i].getPosition());
     }
-
-    centerOfMass.x /= neighbors.length;
-    centerOfMass.y /= neighbors.length;
-
-    const cohesionVector = this.calculateDistanceVector(centerOfMass);
+    centerOfMass = centerOfMass.scale(1 / neighbors.length);
+    const cohesionVector = this.position.subtract(centerOfMass);
     return cohesionVector;
   }
 }
