@@ -84,8 +84,8 @@ export default class Boid {
   public steer(neighbors: Boid[]): void {
     const avoidanceVelocity = this.avoidBorders();
 
-    this.velocity.x += avoidanceVelocity.x / 100;
-    this.velocity.y += avoidanceVelocity.y / 100;
+    this.velocity.x += avoidanceVelocity.x / 5000;
+    this.velocity.y += avoidanceVelocity.y / 5000;
 
     this.velocity = this.normalizeVelocity(this.velocity);
 
@@ -114,7 +114,6 @@ export default class Boid {
   }
 
   private drawShape(): void {
-    this.context.beginPath();
     this.context.fillStyle = this.color;
     // this.context.rect(0, 0, this.size * 5, this.size);
     this.context.beginPath();
@@ -124,10 +123,11 @@ export default class Boid {
     this.context.lineTo(-this.size.x / 3, 0);
     this.context.closePath();
     this.context.fill();
+    this.context.moveTo(0, 0);
   }
 
   private drawFieldOfVision(): void {
-    this.context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    this.context.strokeStyle = 'rgba(0, 0, 0, 0.1)';
     this.context.beginPath();
     this.context.arc(0, 0, this.neighborhoodRadius, 0, 2 * Math.PI);
     this.context.stroke();
@@ -154,15 +154,19 @@ export default class Boid {
       y: 0
     };
     if (this.position.x + this.collisionRadius > this.canvas.width) {
-      steeringVelocity.x = -1;
+      const distance = this.canvas.width - this.position.x;
+      steeringVelocity.x = (this.collisionRadius - distance) * -1;
     } else if (this.position.x - this.collisionRadius < 0) {
-      steeringVelocity.x = 1;
+      const distance = this.position.x;
+      steeringVelocity.x = this.collisionRadius - distance;
     }
 
     if (this.position.y + this.collisionRadius > this.canvas.height) {
-      steeringVelocity.y = -1;
+      const distance = this.canvas.height - this.position.y;
+      steeringVelocity.y = (this.collisionRadius - distance) * -1;
     } else if (this.position.y - this.collisionRadius < 0) {
-      steeringVelocity.y = 1;
+      const distance = this.position.y;
+      steeringVelocity.y = this.collisionRadius - distance;
     }
 
     if (steeringVelocity.x !== 0 || steeringVelocity.y !== 0) {
