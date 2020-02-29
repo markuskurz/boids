@@ -169,12 +169,6 @@ export default class Boid {
       steeringVelocity.y = this.collisionRadius - distance;
     }
 
-    if (steeringVelocity.x !== 0 || steeringVelocity.y !== 0) {
-      this.color = 'red';
-    } else {
-      this.color = 'blue';
-    }
-
     return steeringVelocity;
   }
 
