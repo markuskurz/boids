@@ -81,12 +81,18 @@ export default class Boid {
     return this.velocity;
   }
 
-  public steer(neighbors: Boid[]): void {
-    const avoidanceVelocity = this.avoidBorders();
-
+  public steer(
+    neighbors: Boid[],
+    mousePosition: { x: number; y: number }
+  ): void {
+    let avoidanceVelocity = this.avoidBorders();
     this.velocity.x += avoidanceVelocity.x / 5000;
     this.velocity.y += avoidanceVelocity.y / 5000;
+    this.velocity = this.normalizeVelocity(this.velocity);
 
+    avoidanceVelocity = this.avoidMouse(mousePosition);
+    this.velocity.x += avoidanceVelocity.x / 1000;
+    this.velocity.y += avoidanceVelocity.y / 1000;
     this.velocity = this.normalizeVelocity(this.velocity);
 
     if (neighbors.length > 1) {
@@ -170,6 +176,31 @@ export default class Boid {
     }
 
     return steeringVelocity;
+  }
+
+  private avoidMouse(mousePosition: {
+    x: number;
+    y: number;
+  }): { x: number; y: number } {
+    if (!mousePosition) {
+      return {
+        x: 0,
+        y: 0
+      };
+    }
+    const distanceToMouse = this.calculateDistance(mousePosition);
+    if (distanceToMouse < this.collisionRadius) {
+      const distanceVector = this.calculateDistanceVector(mousePosition);
+      return {
+        x: -distanceVector.x,
+        y: -distanceVector.y
+      };
+    }
+
+    return {
+      x: 0,
+      y: 0
+    };
   }
 
   private calculateSeparation(neighbors: Boid[]): { x: number; y: number } {

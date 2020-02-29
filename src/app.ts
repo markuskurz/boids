@@ -8,6 +8,7 @@ interface MyWindow extends Window {
 
 interface MyDocument extends Document {
   createElement(nodeName: string): HTMLCanvasElement;
+  addEventListener(event: string, callback: object, useCapture?: boolean): void;
 }
 
 declare const window: MyWindow;
@@ -40,6 +41,9 @@ function runSimulation(timestamp: number): void {
 }
 
 function gameLoop(): void {
+  document.addEventListener('mousemove', (e: MouseEvent) =>
+    swarm.onMouseMove(e)
+  );
   window.requestAnimationFrame(runSimulation);
 }
 

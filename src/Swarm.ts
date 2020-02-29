@@ -4,6 +4,7 @@ export default class Swarm {
   private boids: Boid[];
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private mousePosition: { x: number; y: number };
 
   constructor(numberOfBoids: number, canvas: HTMLCanvasElement) {
     this.boids = [];
@@ -19,10 +20,18 @@ export default class Swarm {
     const numberOfBoids = this.boids.length;
     for (let i = 0; i < numberOfBoids; i += 1) {
       const neighbors = this.getNeighbors(this.boids[i]);
-      this.boids[i].steer(neighbors);
+      this.boids[i].steer(neighbors, this.mousePosition);
       this.boids[i].updatePosition(deltaT);
       this.boids[i].draw();
     }
+  }
+
+  public onMouseMove(event: MouseEvent): void {
+    const rect = this.canvas.getBoundingClientRect();
+    this.mousePosition = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
   }
 
   private clearCanvas(): void {
