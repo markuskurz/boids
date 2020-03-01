@@ -1,9 +1,11 @@
 # To do list
 
-* Frame counter
-* Interaction with mouse
-* Send ray to check collision with borders
 * Add debug mode
+* Frame counter
+* Fix border avoidance
+* Send ray to check collision with borders?
+* Clamp speed between min and max values
+* Refactor Vector to Vector2d (or make getOrientation() multidimensional)
 
 ## Ideas:
 
