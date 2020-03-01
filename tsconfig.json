@@ -10,7 +10,7 @@
     "sourceMap": true
   },
   "include": [
-    "src/*"
+    "src/app/*", "src/app/Swarm.ts", "src/app/Point.ts", "src/app/Vector.ts", "src/app/app.ts", "src/app/Boid.ts"
   ],
   "exclude": [
     "node_modules"
