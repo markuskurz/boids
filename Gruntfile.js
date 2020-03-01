@@ -10,7 +10,7 @@ module.exports = grunt => {
       }
     },
     watch: {
-      files: ['./src/*'],
+      files: ['./src/**/*'],
       tasks: ['lint', 'build'],
       options: {
         atBegin: true
