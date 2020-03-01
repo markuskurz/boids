@@ -18,7 +18,7 @@ export default class Swarm {
     this.context = this.canvas.getContext('2d');
     this.debugMode = debugMode;
     for (let i = 0; i < numberOfBoids; i += 1) {
-      this.boids.push(new Boid(this.canvas));
+      this.boids.push(new Boid(this.canvas, this.debugMode));
     }
   }
 
