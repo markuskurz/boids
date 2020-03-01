@@ -1,14 +1,8 @@
 export default class Vector {
   readonly values: number[];
-  readonly x: number;
-  readonly y: number;
-  readonly dimension: number;
 
   constructor(values?: number[]) {
     this.values = values;
-    this.x = values[0];
-    this.y = values[1];
-    this.dimension = values.length;
   }
 
   public length(): number {
@@ -17,6 +11,14 @@ export default class Vector {
     }, 0);
     const length = Math.sqrt(summedSquares);
     return length;
+  }
+
+  public getDimension(): number {
+    return this.values.length;
+  }
+
+  public getOrientation(): number {
+    return Math.atan2(this.values[1], this.values[0]);
   }
 
   public normalize(): Vector {
@@ -28,7 +30,7 @@ export default class Vector {
   }
 
   public add(summand: Vector): Vector {
-    if (this.dimension !== summand.dimension) {
+    if (this.getDimension() !== summand.getDimension()) {
       throw new Error('Vector dimensions differ');
     }
     const sum = this.values.map((value, index) => {
@@ -38,7 +40,7 @@ export default class Vector {
   }
 
   public subtract(minuend: Vector): Vector {
-    if (this.dimension !== minuend.dimension) {
+    if (this.getDimension() !== minuend.getDimension()) {
       throw new Error('Vector dimensions differ');
     }
     const sum = this.values.map((value, index) => {

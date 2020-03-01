@@ -1,11 +1,11 @@
-import Vector from './Vector';
+import Point from './Point';
 import Boid from './Boid';
 
 export default class Swarm {
   private boids: Boid[];
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private mousePosition: Vector;
+  private mousePosition: Point;
 
   constructor(numberOfBoids: number, canvas: HTMLCanvasElement) {
     this.boids = [];
@@ -29,7 +29,7 @@ export default class Swarm {
 
   public onMouseMove(event: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
-    this.mousePosition = new Vector([
+    this.mousePosition = new Point([
       event.clientX - rect.left,
       event.clientY - rect.top
     ]);
@@ -46,8 +46,8 @@ export default class Swarm {
     for (let i = 0; i < numberOfBoids; i += 1) {
       const distance = boid
         .getPosition()
-        .calculateDistance(this.boids[i].getPosition());
-      if (distance > 0 && distance < 100) {
+        .difference(this.boids[i].getPosition());
+      if (distance.length() > 0 && distance.length() < 100) {
         neighbors.push(this.boids[i]);
       }
     }
