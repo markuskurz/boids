@@ -6,11 +6,17 @@ export default class Swarm {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private mousePosition: Point;
+  private debugMode: boolean;
 
-  constructor(numberOfBoids: number, canvas: HTMLCanvasElement) {
+  constructor(
+    numberOfBoids: number,
+    canvas: HTMLCanvasElement,
+    debugMode = false
+  ) {
     this.boids = [];
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
+    this.debugMode = debugMode;
     for (let i = 0; i < numberOfBoids; i += 1) {
       this.boids.push(new Boid(this.canvas));
     }
@@ -18,6 +24,9 @@ export default class Swarm {
 
   public update(deltaT: number): void {
     this.clearCanvas();
+    if (this.debugMode) {
+      this.printFps(deltaT);
+    }
     const numberOfBoids = this.boids.length;
     for (let i = 0; i < numberOfBoids; i += 1) {
       const neighbors = this.getNeighbors(this.boids[i]);
@@ -38,6 +47,13 @@ export default class Swarm {
   private clearCanvas(): void {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     // this.canvas.width = this.canvas.width;
+  }
+
+  private printFps(deltaT: number): void {
+    const fps = Math.round(1000 / deltaT);
+    this.context.font = '12px Arial';
+    this.context.fillStyle = 'rgba(0, 0, 0, 1)';
+    this.context.fillText(`${fps}`, 10, 20);
   }
 
   private getNeighbors(boid: Boid): Boid[] {

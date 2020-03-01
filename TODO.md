@@ -1,7 +1,5 @@
 # To do list
 
-* Add debug mode
-* Frame counter
 * Fix border avoidance
 * Send ray to check collision with borders?
 * Clamp speed between min and max values

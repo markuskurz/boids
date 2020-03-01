@@ -4,6 +4,7 @@ import Point from './Point';
 export default class Boid {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private debugMode: boolean;
   private color: string;
   private position: Point;
   private velocity: Vector;
@@ -13,9 +14,10 @@ export default class Boid {
   private collisionRadius: number;
   private size: number[];
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, debugMode = false) {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
+    this.debugMode = debugMode;
     this.color = 'blue';
     this.size = [20, 15];
     this.speed = 0.2;
@@ -40,7 +42,9 @@ export default class Boid {
     );
     this.context.rotate(this.orientation);
     this.drawShape();
-    this.drawFieldOfVision();
+    if (this.debugMode) {
+      this.drawFieldOfVision();
+    }
     this.context.rotate(-1 * this.orientation);
     this.context.translate(
       -1 * this.position.getCoordinates()[0],
