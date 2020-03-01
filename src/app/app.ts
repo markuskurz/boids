@@ -9,6 +9,7 @@ interface MyWindow extends Window {
 interface MyDocument extends Document {
   createElement(nodeName: string): HTMLCanvasElement;
   addEventListener(event: string, callback: object, useCapture?: boolean): void;
+  hasFocus(): boolean;
 }
 
 declare const window: MyWindow;
@@ -35,7 +36,9 @@ const swarm = setupSwarm();
 
 function runSimulation(timestamp: number): void {
   deltaT = timestamp - lastTimestamp;
-  swarm.update(deltaT);
+  if (document.hasFocus()) {
+    swarm.update(deltaT);
+  }
   lastTimestamp = timestamp;
   window.requestAnimationFrame(runSimulation);
 }
