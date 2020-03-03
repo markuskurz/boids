@@ -49,6 +49,16 @@ export default class Vector {
     return new Vector(sum);
   }
 
+  public multiply(vector: Vector): number {
+    if (this.getDimension() !== vector.getDimension()) {
+      throw new Error('Vector dimensions differ');
+    }
+    const product = this.values.reduce((accumulator, currentValue, index) => {
+      return accumulator + currentValue * vector.values[index];
+    }, 0);
+    return product;
+  }
+
   public scale(factor: number): Vector {
     const scaledValues = this.values.map(value => {
       return value * factor;
@@ -58,5 +68,11 @@ export default class Vector {
 
   public calculateDistance(vector: Vector): number {
     return this.subtract(vector).length();
+  }
+
+  public calculateAngle(vector: Vector): number {
+    const dotProduct = this.multiply(vector);
+    const magnitudeProduct = this.length() * vector.length();
+    return Math.cos(dotProduct / magnitudeProduct);
   }
 }

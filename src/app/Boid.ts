@@ -12,6 +12,7 @@ export default class Boid {
   private orientation: number;
   private neighborhoodRadius: number;
   private collisionRadius: number;
+  private collisionAngle: number;
   private size: number[];
 
   constructor(canvas: HTMLCanvasElement, debugMode = false) {
@@ -20,9 +21,10 @@ export default class Boid {
     this.debugMode = debugMode;
     this.color = 'blue';
     this.size = [20, 15];
-    this.speed = 0.2;
+    this.speed = 0.1;
     this.neighborhoodRadius = 100;
     this.collisionRadius = 200;
+    this.collisionAngle = Math.PI * 0.25;
     this.position = new Point([
       Math.random() * this.canvas.width,
       Math.random() * this.canvas.height
@@ -71,28 +73,27 @@ export default class Boid {
   }
 
   public steer(neighbors: Boid[], mousePosition: Point): void {
-    const borderAvoidanceVelocity = this.avoidBorders().scale(0.0001);
-
+    const borderAvoidanceVelocity = this.avoidBorders().scale(1);
     this.velocity = this.velocity.add(borderAvoidanceVelocity);
+
+    // const mouseAvoidanceVelocity = this.avoidMouse(mousePosition).scale(0.005);
+    // this.velocity = this.velocity.add(mouseAvoidanceVelocity);
+    // this.velocity = this.velocity.normalize();
+
+    // if (neighbors.length > 1) {
+    //   const separationVelocity = this.calculateSeparation(neighbors).scale(
+    //     0.001
+    //   );
+    //   this.velocity = this.velocity.add(separationVelocity);
+    //   const alignmentVelocity = this.calculateAlignment(neighbors).scale(1);
+    //   this.velocity = this.velocity.add(alignmentVelocity);
+    //   const cohesionVelocity = this.calculateCohesion(neighbors).scale(0.1);
+    //   this.velocity = this.velocity.add(cohesionVelocity);
+
+    //   this.velocity = this.velocity.normalize();
+    // }
+
     this.velocity = this.velocity.normalize();
-
-    const mouseAvoidanceVelocity = this.avoidMouse(mousePosition).scale(0.005);
-    this.velocity = this.velocity.add(mouseAvoidanceVelocity);
-    this.velocity = this.velocity.normalize();
-
-    if (neighbors.length > 1) {
-      const separationVelocity = this.calculateSeparation(neighbors).scale(
-        0.001
-      );
-      this.velocity = this.velocity.add(separationVelocity);
-      const alignmentVelocity = this.calculateAlignment(neighbors).scale(1);
-      this.velocity = this.velocity.add(alignmentVelocity);
-      const cohesionVelocity = this.calculateCohesion(neighbors).scale(0.1);
-      this.velocity = this.velocity.add(cohesionVelocity);
-
-      this.velocity = this.velocity.normalize();
-    }
-
     this.velocity = this.velocity.scale(this.speed);
   }
 
@@ -116,36 +117,61 @@ export default class Boid {
 
     this.context.strokeStyle = 'rgba(0, 0, 0, 0.1)';
     this.context.beginPath();
-    this.context.arc(0, 0, this.collisionRadius, 0, 2 * Math.PI);
+    this.context.moveTo(0, 0);
+    this.context.arc(
+      0,
+      0,
+      this.collisionRadius,
+      2 * Math.PI - this.collisionAngle / 2,
+      this.collisionAngle / 2
+    );
+    this.context.lineTo(0, 0);
     this.context.stroke();
   }
 
   private avoidBorders(): Vector {
-    let steeringVelocityX = 0;
-    let steeringVelocityY = 0;
+    const steeringVelocity = [0, 0];
+    this.color = 'blue';
+    // check intersection with left/right borders
     if (
       this.position.getCoordinates()[0] + this.collisionRadius >
       this.canvas.width
     ) {
-      const distance = this.canvas.width - this.position.getCoordinates()[0];
-      steeringVelocityX = (this.collisionRadius - distance) * -1;
-    } else if (this.position.getCoordinates()[0] - this.collisionRadius < 0) {
-      const distance = this.position.getCoordinates()[0];
-      steeringVelocityX = this.collisionRadius - distance;
+      this.color = 'orange';
+      // compute angle between velocity vector and right border
+      const angle = this.velocity.calculateAngle(new Vector([0, 1]));
+      const absoluteAngle = Math.abs(angle);
+      console.log(this.collisionAngle, absoluteAngle);
+      if (absoluteAngle >= this.collisionAngle) {
+        this.color = 'red';
+        steeringVelocity[0] = -10;
+      }
     }
+    // let steeringVelocityX = 0;
+    // let steeringVelocityY = 0;
+    // if (
+    //   this.position.getCoordinates()[0] + this.collisionRadius >
+    //   this.canvas.width
+    // ) {
+    //   const distance = this.canvas.width - this.position.getCoordinates()[0];
+    //   steeringVelocityX = (this.collisionRadius - distance) * -1;
+    // } else if (this.position.getCoordinates()[0] - this.collisionRadius < 0) {
+    //   const distance = this.position.getCoordinates()[0];
+    //   steeringVelocityX = this.collisionRadius - distance;
+    // }
 
-    if (
-      this.position.getCoordinates()[1] + this.collisionRadius >
-      this.canvas.height
-    ) {
-      const distance = this.canvas.height - this.position.getCoordinates()[1];
-      steeringVelocityY = (this.collisionRadius - distance) * -1;
-    } else if (this.position.getCoordinates()[1] - this.collisionRadius < 0) {
-      const distance = this.position.getCoordinates()[1];
-      steeringVelocityY = this.collisionRadius - distance;
-    }
+    // if (
+    //   this.position.getCoordinates()[1] + this.collisionRadius >
+    //   this.canvas.height
+    // ) {
+    //   const distance = this.canvas.height - this.position.getCoordinates()[1];
+    //   steeringVelocityY = (this.collisionRadius - distance) * -1;
+    // } else if (this.position.getCoordinates()[1] - this.collisionRadius < 0) {
+    //   const distance = this.position.getCoordinates()[1];
+    //   steeringVelocityY = this.collisionRadius - distance;
+    // }
 
-    return new Vector([steeringVelocityX, steeringVelocityY]);
+    return new Vector(steeringVelocity);
   }
 
   private avoidMouse(mousePosition: Point): Vector {
