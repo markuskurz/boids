@@ -1,4 +1,4 @@
-import Vector from './Vector';
+import { Vector, initializeRandomVector } from './Vector';
 import Point from './Point';
 
 export default class Boid {
@@ -29,10 +29,7 @@ export default class Boid {
       Math.random() * this.canvas.width,
       Math.random() * this.canvas.height
     ]);
-    this.velocity = new Vector([
-      Math.random() * this.speed * Math.sign(Math.random() - this.speed),
-      Math.random() * this.speed * Math.sign(Math.random() - this.speed)
-    ]);
+    this.velocity = initializeRandomVector(this.speed);
     this.orientation = this.velocity.getOrientation();
     this.draw();
   }

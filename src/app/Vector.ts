@@ -1,4 +1,4 @@
-export default class Vector {
+class Vector {
   readonly values: number[];
 
   constructor(values?: number[]) {
@@ -76,3 +76,15 @@ export default class Vector {
     return Math.cos(dotProduct / magnitudeProduct);
   }
 }
+
+const initializeRandomVector = (magnitude: number): Vector => {
+  const values = [Math.random() - 0.5, Math.random() - 0.5];
+
+  let vector = new Vector(values);
+  vector = vector.normalize();
+  vector = vector.scale(magnitude);
+  return vector;
+};
+
+export default Vector;
+export { Vector, initializeRandomVector };
