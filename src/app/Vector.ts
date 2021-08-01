@@ -24,7 +24,7 @@ class Vector {
   public normalize(): Vector {
     const length = this.length();
     const normalizedValues = this.values.map(value => {
-      return value / length;
+      return value / length || 0;
     });
     return new Vector(normalizedValues);
   }
