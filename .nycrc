@@ -1,0 +1,20 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "include": [
+    "src/**/*.ts"
+  ],
+  "extension": [
+    ".ts"
+  ],
+  "require": [
+    "ts-node/register"
+  ],
+  "reporter": [
+    "lcov"
+  ],
+  "sourceMap": true,
+  "instrument": true,
+  "check-coverage": true,
+  "lines": 100
+}

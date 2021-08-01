@@ -4,7 +4,7 @@
   "description": "Flocking simulator",
   "main": "Boid.js",
   "scripts": {
-    "test": "mocha -r ts-node/register",
+    "test": "nyc --reporter=text mocha -r ts-node/register",
     "dev": "concurrently \"grunt watch\" \"npm run lite\" ",
     "lite": "lite-server --baseDir=\"dist\"",
     "lint": "grunt lint",
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/markuskurz/boids",
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^2.21.0",
@@ -39,6 +40,7 @@
     "grunt-tslint": "^5.0.2",
     "lite-server": "^2.4.0",
     "mocha": "^9.0.3",
+    "nyc": "^15.1.0",
     "prettier": "^1.19.1",
     "ts-loader": "^5.3.3",
     "ts-node": "^10.1.0",
