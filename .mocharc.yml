@@ -1,0 +1,4 @@
+spec:
+  - ./test/**/*.test.ts
+full-trace: true
+exit: true

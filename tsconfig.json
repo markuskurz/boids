@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "es5",
-    "jsx": "react",
-    "allowJs": true,
-    "lib": ["es5", "dom", "es2015.core"],
-    "sourceMap": true
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "dist"
   },
   "include": [
-    "src/app/*", "src/app/Swarm.ts", "src/app/Point.ts", "src/app/Vector.ts", "src/app/app.ts", "src/app/Boid.ts"
+    "src/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules"
