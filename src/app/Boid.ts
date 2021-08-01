@@ -19,9 +19,9 @@ export default class Boid {
     this.canvas = canvas;
     this.context = this.canvas.getContext('2d');
     this.debugMode = debugMode;
-    this.color = 'blue';
+    this.color = 'gray';
     this.size = [20, 15];
-    this.speed = 0.1;
+    this.speed = 0.25;
     this.neighborhoodRadius = 100;
     this.collisionRadius = 200;
     this.collisionAngle = Math.PI * 0.25;
@@ -70,26 +70,27 @@ export default class Boid {
   }
 
   public steer(neighbors: Boid[], mousePosition: Point): void {
-    const borderAvoidanceVelocity = this.avoidBorders().scale(0.005);
+    const borderAvoidanceVelocity = this.avoidBorders().scale(0.05);
     this.velocity = this.velocity.add(borderAvoidanceVelocity);
-    // console.log(borderAvoidanceVelocity.values);
 
-    // const mouseAvoidanceVelocity = this.avoidMouse(mousePosition).scale(0.005);
-    // this.velocity = this.velocity.add(mouseAvoidanceVelocity);
-    // this.velocity = this.velocity.normalize();
+    const mouseAvoidanceVelocity = this.avoidMouse(mousePosition).scale(0.001);
+    this.velocity = this.velocity.add(mouseAvoidanceVelocity);
+    this.velocity = this.velocity.normalize();
 
-    // if (neighbors.length > 1) {
-    //   const separationVelocity = this.calculateSeparation(neighbors).scale(
-    //     0.001
-    //   );
-    //   this.velocity = this.velocity.add(separationVelocity);
-    //   const alignmentVelocity = this.calculateAlignment(neighbors).scale(1);
-    //   this.velocity = this.velocity.add(alignmentVelocity);
-    //   const cohesionVelocity = this.calculateCohesion(neighbors).scale(0.1);
-    //   this.velocity = this.velocity.add(cohesionVelocity);
-
-    //   this.velocity = this.velocity.normalize();
-    // }
+    if (neighbors.length > 0) {
+      const separationVelocity = this.calculateSeparation(neighbors)
+        .normalize()
+        .scale(0.05);
+      this.velocity = this.velocity.add(separationVelocity);
+      const alignmentVelocity = this.calculateAlignment(neighbors)
+        .normalize()
+        .scale(0.05);
+      this.velocity = this.velocity.add(alignmentVelocity);
+      const cohesionVelocity = this.calculateCohesion(neighbors)
+        .normalize()
+        .scale(0.01);
+      this.velocity = this.velocity.add(cohesionVelocity);
+    }
 
     this.velocity = this.velocity.normalize();
     this.velocity = this.velocity.scale(this.speed);
@@ -129,7 +130,6 @@ export default class Boid {
 
   private avoidBorders(): Vector {
     const steeringVelocity = [0, 0];
-    this.color = 'blue';
 
     const position = this.position.getCoordinates();
     const distanceToRightBorder = this.canvas.width - position[0];
@@ -145,8 +145,6 @@ export default class Boid {
     }
 
     const distanceToTopBorder = position[1];
-
-    // console.log(angleToHorizontalBorder);
     if (distanceToTopBorder < this.collisionRadius) {
       steeringVelocity[1] +=
         (this.collisionRadius - distanceToTopBorder) / this.collisionRadius;
@@ -167,16 +165,22 @@ export default class Boid {
     }
     const distanceVector = this.position.difference(mousePosition);
     const distanceToMouse = distanceVector.length();
-    if (distanceToMouse < this.neighborhoodRadius) {
-      return distanceVector;
+
+    if (distanceToMouse < this.collisionRadius) {
+      return distanceVector.scale(
+        (this.collisionRadius - distanceToMouse) / distanceToMouse
+      );
     }
     return new Vector([0, 0]);
   }
 
   private calculateSeparation(neighbors: Boid[]): Vector {
-    let steeringVelocity = new Vector([0, 0]);
+    let steeringVelocity = this.getVelocity();
+    const position = new Point(this.position.getCoordinates());
     for (let i = 0; i < neighbors.length; i += 1) {
-      const direction = this.position.difference(neighbors[i].getPosition());
+      const direction = position
+        .difference(neighbors[i].getPosition())
+        .normalize();
       steeringVelocity = steeringVelocity.add(direction);
     }
     steeringVelocity = steeringVelocity.scale(1 / neighbors.length);
@@ -193,12 +197,13 @@ export default class Boid {
   }
 
   private calculateCohesion(neighbors: Boid[]): Vector {
-    let centerOfMass = new Point([0, 0]);
+    let centerOfMass = new Point(this.position.getCoordinates());
     for (let i = 0; i < neighbors.length; i += 1) {
       const difference = centerOfMass.difference(neighbors[i].getPosition());
       centerOfMass = centerOfMass.move(difference.scale(1 / neighbors.length));
     }
-    const cohesionVector = this.position.difference(centerOfMass);
+    const position = new Point(this.position.getCoordinates());
+    const cohesionVector = position.difference(centerOfMass);
     return cohesionVector;
   }
 }

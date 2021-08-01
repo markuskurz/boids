@@ -63,8 +63,13 @@ export default class Swarm {
       const distance = boid
         .getPosition()
         .difference(this.boids[i].getPosition());
+
       if (distance.length() > 0 && distance.length() < 100) {
-        neighbors.push(this.boids[i]);
+        const angle = boid.getVelocity().calculateAngle(distance);
+        const collisionAngle = Math.PI * 0.25;
+        if (angle < collisionAngle) {
+          neighbors.push(this.boids[i]);
+        }
       }
     }
     return neighbors;
