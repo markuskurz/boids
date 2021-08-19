@@ -72,6 +72,10 @@ export default class Swarm {
         }
       }
     }
+
+    const max = 10;
+    const saturation = (neighbors.length / max) * 100;
+    boid.setColor(`hsl(210, ${saturation}%, 50%)`);
     return neighbors;
   }
 }

@@ -51,6 +51,10 @@ export default class Boid {
     );
   }
 
+  public setColor(color: string): void {
+    this.color = color;
+  }
+
   public updatePosition(deltaT: number): void {
     this.position = this.move(deltaT);
     this.orientation = this.velocity.getOrientation();
